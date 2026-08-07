@@ -1,0 +1,32 @@
+# Byte-compiled / optimized files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment variables
+.env
+.env.local
+
+# Heavy binary models (keep track via LFS if needed)
+*.keras
+venv/
+
+# Generated assets & uploads
+backend/uploads/*
+!backend/uploads/.gitkeep
+backend/heatmaps/*
+!backend/heatmaps/.gitkeep
+backend/reports/*
+!backend/reports/.gitkeep
+
+# Node.js
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+*.local
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

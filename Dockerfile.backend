@@ -1,0 +1,32 @@
+# PneumoVision AI Backend Dockerfile
+FROM python:3.10-slim
+
+WORKDIR /app
+
+# Install system dependencies for OpenCV and ReportLab
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy python dependencies file
+COPY backend/requirements.txt .
+
+# Install dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy backend code
+COPY backend/ ./backend
+COPY pneumovision_vgg16_final.keras .
+COPY evaluation_metrics.csv .
+COPY .env .
+
+WORKDIR /app/backend
+
+# Create required directories
+RUN mkdir -p uploads heatmaps reports static
+
+EXPOSE 8000
+
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
