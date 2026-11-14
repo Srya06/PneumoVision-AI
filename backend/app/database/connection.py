@@ -54,7 +54,11 @@ class DatabaseManager:
     def get_db(cls) -> AsyncIOMotorDatabase:
         """Return the active database handle."""
         if cls._db is None:
-            raise RuntimeError("Database not connected. Call DatabaseManager.connect() first.")
+            from fastapi import HTTPException
+            raise HTTPException(
+                status_code=503,
+                detail="Database unavailable. Please update MONGODB_URI in your .env file with an active MongoDB connection string."
+            )
         return cls._db
 
     @classmethod

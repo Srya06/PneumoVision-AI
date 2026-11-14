@@ -89,10 +89,13 @@ async def lifespan(app: FastAPI):
         Path(dir_name).mkdir(parents=True, exist_ok=True)
 
     # Connect to MongoDB Atlas
-    await DatabaseManager.connect()
-
-    # Seed initial accounts
-    await _seed_default_users()
+    try:
+        await DatabaseManager.connect()
+        # Seed initial accounts
+        await _seed_default_users()
+    except Exception as exc:
+        logger.error("⚠️ MongoDB connection failed during startup: %s", exc)
+        logger.warning("Backend is running, but database routes will return 503 until a valid MONGODB_URI is set in .env.")
 
     # Load TensorFlow model (singleton — loads once)
     ModelLoader.load()
@@ -208,9 +211,11 @@ app.include_router(audit.router)
 # ── Health Check ──────────────────────────────────────────────────────────────
 @app.get("/health", tags=["Health"])
 async def health_check():
-    """Quick health check — verifies the app is running and model is loaded."""
+    """Quick health check — verifies the app is running, model is loaded, and reports DB status."""
+    db_status = "connected" if DatabaseManager._db is not None else "disconnected"
     return {
-        "status": "healthy",
+        "status": "healthy" if db_status == "connected" else "degraded",
+        "database": db_status,
         "app": settings.app_name,
         "version": settings.app_version,
         "model": ModelLoader.model_info(),
