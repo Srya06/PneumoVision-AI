@@ -88,14 +88,10 @@ async def lifespan(app: FastAPI):
     for dir_name in [settings.upload_dir, settings.heatmap_dir, settings.report_dir, "static"]:
         Path(dir_name).mkdir(parents=True, exist_ok=True)
 
-    # Connect to MongoDB Atlas
-    try:
-        await DatabaseManager.connect()
-        # Seed initial accounts
-        await _seed_default_users()
-    except Exception as exc:
-        logger.error("⚠️ MongoDB connection failed during startup: %s", exc)
-        logger.warning("Backend is running, but database routes will return 503 until a valid MONGODB_URI is set in .env.")
+    # Connect to MongoDB Atlas (or in-memory fallback)
+    await DatabaseManager.connect()
+    # Seed initial accounts
+    await _seed_default_users()
 
     # Load TensorFlow model (singleton — loads once)
     ModelLoader.load()

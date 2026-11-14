@@ -29,17 +29,29 @@ class DatabaseManager:
         if cls._client is not None:
             return
         logger.info("Connecting to MongoDB Atlas …")
-        cls._client = AsyncIOMotorClient(
-            settings.mongodb_uri,
-            maxPoolSize=10,
-            minPoolSize=1,
-            serverSelectionTimeoutMS=10_000,
-        )
-        cls._db = cls._client[settings.mongodb_db_name]
-        # Validate the connection
-        await cls._client.admin.command("ping")
-        logger.info("✅ MongoDB Atlas connected — DB: %s", settings.mongodb_db_name)
-        await cls._ensure_indexes()
+        try:
+            cls._client = AsyncIOMotorClient(
+                settings.mongodb_uri,
+                maxPoolSize=10,
+                minPoolSize=1,
+                serverSelectionTimeoutMS=2_500,
+            )
+            cls._db = cls._client[settings.mongodb_db_name]
+            # Validate the connection
+            await cls._client.admin.command("ping")
+            logger.info("✅ MongoDB Atlas connected — DB: %s", settings.mongodb_db_name)
+            await cls._ensure_indexes()
+        except Exception as exc:
+            logger.warning("⚠️ MongoDB connection failed (%s).", exc)
+            logger.warning("Falling back to local in-memory database for seamless offline/local development.")
+            try:
+                import mongomock_motor
+                cls._client = mongomock_motor.AsyncMongoMockClient()
+                cls._db = cls._client[settings.mongodb_db_name]
+                logger.info("✅ In-memory database ready.")
+            except Exception as e:
+                logger.error("Could not initialize in-memory database: %s", e)
+                raise exc
 
     @classmethod
     async def disconnect(cls) -> None:
