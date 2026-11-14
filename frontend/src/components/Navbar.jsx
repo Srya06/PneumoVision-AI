@@ -56,7 +56,7 @@ const Navbar = () => {
         <div className="flex items-center gap-2 pl-2 border-l border-slate-200 dark:border-slate-800">
           <div className="text-right hidden sm:block">
             <div className="text-sm font-semibold text-slate-800 dark:text-slate-100">
-              Dr. {user?.full_name || user?.username}
+              {user?.full_name?.startsWith('Dr.') ? user?.full_name : `Dr. ${user?.full_name || user?.username}`}
             </div>
             <div className="text-xs text-slate-500 dark:text-slate-400">{user?.department || 'Department of Radiology'}</div>
           </div>

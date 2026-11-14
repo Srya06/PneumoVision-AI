@@ -58,7 +58,7 @@ def check_image_quality(img: Image.Image) -> float:
     """Check image for blurriness using Laplacian variance."""
     gray = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2GRAY)
     variance = cv2.Laplacian(gray, cv2.CV_64F).var()
-    if variance < 50.0: # Threshold for blur
+    if variance < 10.0: # Permissive threshold for blur
         raise ValueError(f"Image quality check failed. The image is too blurry (variance: {variance:.2f}). Please upload a clearer X-ray.")
     return variance
 

@@ -72,7 +72,7 @@ const Sidebar = () => {
           </div>
           <div className="truncate">
             <p className="text-sm font-bold text-slate-800 dark:text-slate-200 truncate">
-              Dr. {user?.full_name || user?.username}
+              {user?.full_name?.startsWith('Dr.') ? user?.full_name : `Dr. ${user?.full_name || user?.username}`}
             </p>
             <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{user?.department || 'Physician'}</p>
           </div>

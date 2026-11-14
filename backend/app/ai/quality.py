@@ -10,8 +10,8 @@ import logging
 
 logger = logging.getLogger("pneumovision.ai.quality")
 
-MIN_RESOLUTION = (256, 256)
-BLUR_THRESHOLD = 50.0  # Variance of Laplacian threshold
+MIN_RESOLUTION = (64, 64)
+BLUR_THRESHOLD = 10.0  # Permissive threshold for medical X-rays
 
 def assess_image_quality(image_bytes: bytes) -> dict:
     """
